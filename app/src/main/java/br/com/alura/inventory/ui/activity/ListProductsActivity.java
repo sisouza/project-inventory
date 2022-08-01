@@ -1,19 +1,28 @@
 package br.com.alura.inventory.ui.activity;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.IOException;
+import java.util.List;
+
 import br.com.alura.inventory.R;
 import br.com.alura.inventory.asynctask.BaseAsyncTask;
 import br.com.alura.inventory.database.InventoryDatabase;
 import br.com.alura.inventory.database.dao.ProductsDAO;
 import br.com.alura.inventory.model.Product;
+import br.com.alura.inventory.retrofit.InventoryRetrofit;
+import br.com.alura.inventory.retrofit.service.ProductService;
 import br.com.alura.inventory.ui.dialog.UpdateProductDialog;
 import br.com.alura.inventory.ui.dialog.SaveProductDialog;
 import br.com.alura.inventory.ui.recyclerview.adapter.ListProdutcsAdapter;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class ListProductsActivity extends AppCompatActivity {
 
@@ -37,9 +46,30 @@ public class ListProductsActivity extends AppCompatActivity {
     }
 
     private void searchProducts() {
-        new BaseAsyncTask<>(dao::searchAll,
-                result -> adapter.update(result))
-                .execute();
+        ProductService service = new InventoryRetrofit().getProductService();
+        Call<List<Product>> call = service.getAll();
+
+        new BaseAsyncTask<>(() ->{
+            try {
+                Response<List<Product>> response = call.execute();
+                return response.body();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }, newProducts -> {
+            if (newProducts != null){
+                adapter.update(newProducts);
+            }else {
+                Toast.makeText(this, "It was not possible to return products",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        });
+//        new BaseAsyncTask<>(dao::searchAll,
+//                result -> adapter.update(result))
+//                .execute();
+
     }
 
     private void setProdutcsList() {
