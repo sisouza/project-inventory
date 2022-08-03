@@ -26,4 +26,7 @@ public interface ProductsDAO {
 
     @Delete
     void remove(Product product);
+
+    @Insert
+    void saveInternaly(List<Product> products);
 }

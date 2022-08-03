@@ -52,7 +52,10 @@ public class ListProductsActivity extends AppCompatActivity {
         new BaseAsyncTask<>(() ->{
             try {
                 Response<List<Product>> response = call.execute();
-                return response.body();
+                List<Product>  newProducts = response.body();
+                //save products internaly when there is no network to external connection
+                dao.saveInternaly(newProducts);
+                return dao.searchAll();
             } catch (IOException e) {
                 e.printStackTrace();
             }
