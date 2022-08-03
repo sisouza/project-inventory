@@ -55,11 +55,10 @@ public class ListProductsActivity extends AppCompatActivity {
                 List<Product>  newProducts = response.body();
                 //save products internaly when there is no network to external connection
                 dao.saveInternaly(newProducts);
-                return dao.searchAll();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
+            return dao.searchAll();
         }, newProducts -> {
             if (newProducts != null){
                 adapter.update(newProducts);
